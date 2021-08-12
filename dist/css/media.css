@@ -1,0 +1,95 @@
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+
+}
+@media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
+only screen and (-moz-min-device-pixel-ratio: 1.5),
+only screen and (-o-min-device-pixel-ratio: 3/2),
+only screen and (min-device-pixel-ratio: 1.5),
+only screen and (-webkit-min-device-pixel-ratio: 1.5),
+only screen and (min-resolution: 1.5dppx){
+  .section {
+    background-image: url('../img');
+  }
+}
+
+
+
+@media screen and (max-width: 790px){
+  .modal {
+    width: 98%;
+  }
+  .modal__container{
+    max-width: 100%;
+  }
+  .modal__title{
+    font-size: 34px;
+  }
+  .icon-round{
+    height: 2rem;
+    width: 2rem;
+  }
+}
+@media screen and (max-width: 480px){
+  .modal{
+    height: 100vh;
+  }
+  .modal__container{
+    padding: 40px 10px 30px;
+    overflow-y: auto;
+  }
+  .modal__title{
+    font-size: 24px;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+  .modal__main-link{
+    margin-top: 15px;
+    height: 2.75rem;
+  }
+  .modal-form{
+    margin-top: 15px;
+  }
+  .modal-form__input{
+    height: 2.75rem;
+  }
+  .modal-form__wrap-input:not(:first-child) {
+    margin-top: 17px;
+  }
+  .input-text__error, .input__error{
+    font-size: 11px;
+    margin-top: 1px;
+  }
+  .icon-round{
+    height: 2rem;
+    width: 2rem;
+  }
+  .modal__main-link span{
+    font-size: 16px;
+  }
+  .modal__order-call{
+    font-size: 17px;
+  }
+  .modal__main-link svg{
+    width: 23px;
+    height: 23px;
+  }
+  .modal__form {
+    width: 100%;
+    max-width: 265px;
+    margin: 0 auto;
+  }
+  .agree-to-hand{
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+  }
+  .button_form{
+    margin-top: 15px;
+    margin-bottom: 20px;
+  }
+  .close-modal{
+    /*right: 50%;*/
+    /*transform: translateX(50%);*/
+  }
+}
