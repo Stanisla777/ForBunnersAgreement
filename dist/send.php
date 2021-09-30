@@ -5,13 +5,21 @@
  *  При обращении send.php?debug=1 с остальными параметрами (name, number либо email, text) будет отображатсья отладочная информация, вместо редиректа на страницу index.html
  */
 
+//$debug = true; //Только для отладки
+
+$secretKey = "6Le1pHAcAAAAAG4n8eNo0nMfTsU8wWaTZrMxB6XN";
+$ip = $_SERVER['REMOTE_ADDR'];
+
+$captcha = filter_input(INPUT_POST, 'g-recaptcha-response', FILTER_SANITIZE_STRING);
 $name = htmlspecialchars(trim($_REQUEST['name']));
 $phone = htmlspecialchars(trim($_REQUEST['number']));
 
 $topic = htmlspecialchars(trim($_REQUEST['form_text_1']));
 $email = htmlspecialchars(trim($_REQUEST['email']));
 $question = htmlspecialchars(trim($_REQUEST['text']));
-$debug = boolval(htmlspecialchars(trim($_REQUEST['debug'])));
+
+
+$captchaVerified = checkCaptcha($secretKey,$captcha);
 
 $title = '';
 if ($name && $phone) {
@@ -21,7 +29,7 @@ if ($email && $question) {
     $title = 'Вопрос от посетителя сайта ' . $_SERVER['HTTP_HOST'];
 }
 
-if ($title) {
+if ($title && $captchaVerified) {
 
     $mailFrom = 'no-reply@domrf.ru';
     $mailTo = 'consultant@domrf.ru';
@@ -54,18 +62,19 @@ if ($title) {
 
     $mailed = mail($mailTo, $title, $message, $headers);
     if ($debug) {
-        echo $mailed ? 'Email sent!' : 'Error during send email ((';
-        echo "<br><br>headers:<br><pre>";
-        print_r($headers);
-        echo "</pre><br>";
-        echo "<br>Message:<br><pre>";
-        print_r($message);
-        echo "</pre>";
+        logger($mailed ? 'Email sent!' : 'Error during send email ((');
+        logger("headers:");
+        logger($headers);
+        logger("Message:");
+        logger($message);
     }
-
 } else {
     if ($debug){
-        echo "Missed some parameters";
+        if (!$captchaVerified){
+            logger('!!! Wrong captcha');
+        } else {
+            logger("!!! Missed some parameters");
+        }
     }
 }
 if (!$debug) {
@@ -73,4 +82,39 @@ if (!$debug) {
     $uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
     header("Location: http://$host$uri/index.html");
     exit;
+}
+
+function logger ($v){
+    file_put_contents('log.txt',print_r($v,1),FILE_APPEND);
+    echo "<pre>"; print_r($v); echo "</pre>";
+}
+
+/** Проверка Google Recaptcha
+ * @param $secretKey
+ * @param $captcha
+ * @return bool
+ */
+function checkCaptcha($secretKey,$captcha){
+    global $debug;
+    $url = 'https://www.google.com/recaptcha/api/siteverify';
+    $data = array('secret' => $secretKey, 'response' => $captcha);
+
+    $options = array(
+        'http' => array(
+            'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+            'method'  => 'POST',
+            'content' => http_build_query($data)
+        )
+    );
+    $context  = stream_context_create($options);
+    $response = file_get_contents($url, false, $context);
+    $responseKeys = json_decode($response,true);
+    if($responseKeys["success"]) {
+        return true;
+    } else {
+        if ($debug){
+            logger("Captcha response:");
+            logger($responseKeys);
+        }
+    }
 }
